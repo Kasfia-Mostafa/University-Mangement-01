@@ -25,7 +25,8 @@ const guardianSchema = new Schema<Guardian>({
     type: String,
     required: true,
   },
-  fatherContectNo: {  // Ensure it matches your type definition
+  fatherContectNo: {
+    // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -37,7 +38,8 @@ const guardianSchema = new Schema<Guardian>({
     type: String,
     required: true,
   },
-  motherContectNo: {  // Ensure it matches your type definition
+  motherContectNo: {
+    // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -84,7 +86,8 @@ const studentSchema = new Schema<Student>({
     type: String,
     required: true,
   },
-  emargencyContactNo: {  // Ensure it matches your type definition
+  emargencyContactNo: {
+    // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -96,7 +99,8 @@ const studentSchema = new Schema<Student>({
     type: String,
     required: true,
   },
-  parmanentAddress: {  // Ensure it matches your type definition
+  parmanentAddress: {
+    // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -109,4 +113,4 @@ const studentSchema = new Schema<Student>({
   },
 });
 
-export const StudentModel = model<Student>("Student", studentSchema);
+export const StudentModel = model<Student>('Student', studentSchema);
