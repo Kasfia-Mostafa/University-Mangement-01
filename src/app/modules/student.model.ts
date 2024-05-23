@@ -1,4 +1,4 @@
-import { Schema , model} from 'mongoose';
+import { Schema, model } from 'mongoose';
 import {
   Guardian,
   LocalGuardian,
@@ -25,7 +25,7 @@ const guardianSchema = new Schema<Guardian>({
     type: String,
     required: true,
   },
-  fatherContectNo: {
+  fatherContectNo: {  // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -37,7 +37,7 @@ const guardianSchema = new Schema<Guardian>({
     type: String,
     required: true,
   },
-  motherContectNo: {
+  motherContectNo: {  // Ensure it matches your type definition
     type: String,
     required: true,
   },
@@ -69,8 +69,13 @@ const localGuardianSchema = new Schema<LocalGuardian>({
 const studentSchema = new Schema<Student>({
   id: { type: String },
   name: userNameSchema,
-  gender: ['male', 'female'],
-  dateOfBirth: String,
+  gender: {
+    type: String,
+    enum: ['male', 'female'],
+  },
+  dateOfBirth: {
+    type: String,
+  },
   email: {
     type: String,
     required: true,
@@ -79,24 +84,29 @@ const studentSchema = new Schema<Student>({
     type: String,
     required: true,
   },
-  emargencyContactNo: {
+  emargencyContactNo: {  // Ensure it matches your type definition
     type: String,
     required: true,
   },
-  bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  },
   presentAddress: {
     type: String,
     required: true,
   },
-  parmanentAddress: {
+  parmanentAddress: {  // Ensure it matches your type definition
     type: String,
     required: true,
   },
   guardian: guardianSchema,
   localGuardian: localGuardianSchema,
   profileImg: { type: String },
-  isActive: ['active', 'blocked'],
+  isActive: {
+    type: String,
+    enum: ['active', 'blocked'],
+  },
 });
 
-
-export const StudentModel = model<Student>("Student",studentSchema)
+export const StudentModel = model<Student>("Student", studentSchema);
