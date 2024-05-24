@@ -57,7 +57,6 @@ const guardianSchema = new Schema<Guardian>({
     required: true,
   },
   motherContectNo: {
-    // Ensure it matches your type definition
     type: String,
     required: true,
   },

@@ -14,18 +14,18 @@ export type LocalGuardian = {
 };
 export type Username = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 export type Student = {
   id: string;
   name: Username;
-  gender: 'male' | 'female';
+  gender: 'male' | 'female'|'other';
   dateOfBirth?: string;
   contactNo: string;
   emargencyContactNo: string;
   email: string;
-  bloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   presentAddress: string;
   parmanentAddress: string;
   guardian: Guardian;
