@@ -30,11 +30,11 @@ const zodparseData = studentValidationSchema.parse(studentData)
       message: 'Student is created successfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.log(err);
     res.status(500).json({
       success: false,
-      message: 'Internal Server Error',
+      message: err.message ||'Internal Server Error',
     });
   }
 };
