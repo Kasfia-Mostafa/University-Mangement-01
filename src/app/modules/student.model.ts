@@ -2,12 +2,13 @@ import { Schema, model } from 'mongoose';
 import validator from 'validator';
 
 import {
+  StudentModel,
   TGuardian,
   TLocalGuardian,
   TStudent,
-  StudentModel,
+ 
   TUsername,
-  StudentMethods,
+  // StudentMethods,
 } from './student/student.interface';
 
 const userNameSchema = new Schema<TUsername>({
@@ -86,7 +87,7 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   },
 });
 
-const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
+const studentSchema = new Schema<TStudent, StudentModel>({
   id: { type: String, required: true, unique: true },
   name: {
     type: userNameSchema,
@@ -149,6 +150,16 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
     default: 'active',
   },
 });
+
+
+// creating a custom satic method 
+
+studentSchema.static.isUserExists= async function (id:string) {
+  const existingUser = await Student.findOne({id})
+  return existingUser;
+}
+
+
 // creating a custom instance method
 // studentSchema.methods.isUserExists = async function (id: string) {
 //   const existingUser = await Student.findOne({ id });
