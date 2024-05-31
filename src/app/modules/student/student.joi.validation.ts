@@ -25,7 +25,7 @@ const userNameValidationSchema = Joi.object({
     fatherName: Joi.string().required().messages({
       'string.empty': 'Father name is required',
     }),
-    fatherContectNo: Joi.string().required().messages({
+    fatherContactNo: Joi.string().required().messages({
       'string.empty': 'Father contact number is required',
     }),
     fatherOccupation: Joi.string().required(),
@@ -59,7 +59,7 @@ const userNameValidationSchema = Joi.object({
       'string.email': '{#label} is not a valid email',
     }),
     contactNo: Joi.string().required(),
-    emargencyContactNo: Joi.string().required(),
+    emergencyContactNo: Joi.string().required(),
     bloodGroup: Joi.string().valid(
       'A+',
       'A-',
@@ -71,7 +71,7 @@ const userNameValidationSchema = Joi.object({
       'O-',
     ),
     presentAddress: Joi.string().required(),
-    parmanentAddress: Joi.string().required(),
+    permanentAddress: Joi.string().required(),
     guardian: guardianValidationSchema.required(),
     localGuardian: localGuardianValidationSchema.required(),
     profileImg: Joi.string().uri().optional(),

@@ -1,29 +1,15 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
+import { StudentModel, TGuardian, TLocalGuardian, TStudent, TUsername } from './student.interface';
+import studentValidationSchema from './student.zod.validation';
 
-import {
-  StudentModel,
-  TGuardian,
-  TLocalGuardian,
-  TStudent,
- 
-  TUsername,
-  // StudentMethods,
-} from './student/student.interface';
-
+// Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
   firstName: {
     type: String,
-    required: [true, 'First name is required'],
+    required: true,
     trim: true,
-    maxlength: [20, 'Max allowed length is 20'],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
-        return firstNameStr === value;
-      },
-      message: '{VALUE} is not in capitalize',
-    },
+    maxlength: 20,
   },
   middleName: {
     type: String,
@@ -32,25 +18,21 @@ const userNameSchema = new Schema<TUsername>({
   lastName: {
     type: String,
     trim: true,
-    required: [true, 'Last name is required'],
-    validate: {
-      validator: (value: string) => validator.isAlpha(value),
-      message: `{VALUE} is not valid`,
-    },
+    required: true,
   },
 });
 
+// Define the schema for TGuardian
 const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
-    required: [true, 'First name is required'],
-  },
-  fatherContectNo: {
-    // Ensure it matches your type definition
-    type: String,
-    required: [true, 'This field is required'],
+    required: true,
   },
   fatherOccupation: {
+    type: String,
+    required: true,
+  },
+  fatherContactNo: {
     type: String,
     required: true,
   },
@@ -58,16 +40,17 @@ const guardianSchema = new Schema<TGuardian>({
     type: String,
     required: true,
   },
-  motherContectNo: {
+  motherOccupation: {
     type: String,
     required: true,
   },
-  motherOccupation: {
+  motherContactNo: {
     type: String,
     required: true,
   },
 });
 
+// Define the schema for TLocalGuardian
 const localGuardianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
@@ -87,18 +70,26 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
   },
 });
 
+// Define the schema for TStudent
 const studentSchema = new Schema<TStudent, StudentModel>({
-  id: { type: String, required: true, unique: true },
+  id: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "USer id is required"],
+    unique: true,
+    ref: 'User',
+  },
   name: {
     type: userNameSchema,
     required: true,
   },
   gender: {
     type: String,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message: "{VAlUE} do not follow 'male,'female' or 'other'",
-    },
+    enum: ['male', 'female', 'other'],
     required: true,
   },
   dateOfBirth: {
@@ -110,15 +101,14 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     unique: true,
     validate: {
       validator: (value: string) => validator.isEmail(value),
-      message: `{VALUE} is not valid email`,
+      message: '{VALUE} is not a valid email',
     },
   },
   contactNo: {
     type: String,
     required: true,
   },
-  emargencyContactNo: {
-    // Ensure it matches your type definition
+  emergencyContactNo: {
     type: String,
     required: true,
   },
@@ -130,8 +120,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: String,
     required: true,
   },
-  parmanentAddress: {
-    // Ensure it matches your type definition
+  permanentAddress: {
     type: String,
     required: true,
   },
@@ -143,28 +132,27 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: localGuardianSchema,
     required: true,
   },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
+  profileImg: { 
+    type: String 
   },
 });
 
+// Add pre-save hook to validate with Zod
+studentSchema.pre('save', function (next) {
+  const student = this.toObject();
+  try {
+    studentValidationSchema.parse(student);
+    next();
+  } catch (error:any) {
+    next(error);
+  }
+});
 
-// creating a custom satic method 
-
-studentSchema.static.isUserExists= async function (id:string) {
-  const existingUser = await Student.findOne({id})
+// Create a custom static method
+studentSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await this.findOne({ id });
   return existingUser;
-}
+};
 
-
-// creating a custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-
-//   return existingUser;
-// };
-
+// Export the Student model
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);

@@ -1,21 +1,21 @@
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
-import studentValidationSchema from './student.zod.validation';
+// import studentValidationSchema from './student.zod.validation';
 // import studentValidationSchema from './student.joi.validation';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = req.body;
-// data bvalidation data by joi
-    // const { error,value } = studentValidationSchema.validate(studentData);
+// const createStudent = async (req: Request, res: Response) => {
+//   try {
+//     const { student: studentData } = req.body;
+// // data validation data by joi
+//     // const { error,value } = studentValidationSchema.validate(studentData);
 
-// data bvalidation data by zod
+// // data alidation data by zod
 
-const zodparseData = studentValidationSchema.parse(studentData)
+// const zodparseData = studentValidationSchema.parse(studentData)
 
 
 
-    const result = await StudentServices.createStudentIntoDB(zodparseData);
+//     const result = await StudentServices.createStudentIntoDB(zodparseData);
 
     // if (error) {
     //   return res.status(400).json({
@@ -25,19 +25,19 @@ const zodparseData = studentValidationSchema.parse(studentData)
     //   });
     // }
 
-    res.status(200).json({
-      success: true,
-      message: 'Student is created successfully',
-      data: result,
-    });
-  } catch (err: any) {
-    console.log(err);
-    res.status(500).json({
-      success: false,
-      message: err.message ||'Internal Server Error',
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       message: 'Student is created successfully',
+//       data: result,
+//     });
+//   } catch (err: any) {
+//     console.log(err);
+//     res.status(500).json({
+//       success: false,
+//       message: err.message ||'Internal Server Error',
+//     });
+//   }
+// };
 
 const getAllStudents = async (req: Request, res: Response) => {
   try {
@@ -75,7 +75,7 @@ const getSingleStudent = async (req: Request, res: Response) => {
 };
 
 export const StudentControllers = {
-  createStudent,
+  // createStudent,
   getAllStudents,
   getSingleStudent,
 };
