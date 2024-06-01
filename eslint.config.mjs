@@ -21,6 +21,7 @@ export default [
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "error",
       "no-console": "off",
+      "@typescript-eslint/no-explicit-any": "error",
       "no-restricted-syntax": [
           "error",
           {

@@ -1,7 +1,15 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import { StudentModel, TGuardian, TLocalGuardian, TStudent, TUsername } from './student.interface';
+import bcrypt from 'bcrypt';
+import {
+  StudentModel,
+  TGuardian,
+  TLocalGuardian,
+  TStudent,
+  TUsername,
+} from './student.interface';
 import studentValidationSchema from './student.zod.validation';
+import config from '../../config';
 
 // Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
@@ -72,14 +80,14 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 
 // Define the schema for TStudent
 const studentSchema = new Schema<TStudent, StudentModel>({
-  id: { 
-    type: String, 
-    required: true, 
-    unique: true 
+  id: {
+    type: String,
+    required: true,
+    unique: true,
   },
   user: {
     type: Schema.Types.ObjectId,
-    required: [true, "USer id is required"],
+    required: [true, 'USer id is required'],
     unique: true,
     ref: 'User',
   },
@@ -132,8 +140,12 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     type: localGuardianSchema,
     required: true,
   },
-  profileImg: { 
-    type: String 
+  profileImg: {
+    type: String,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -143,9 +155,43 @@ studentSchema.pre('save', function (next) {
   try {
     studentValidationSchema.parse(student);
     next();
-  } catch (error:any) {
+  } catch (error: any) {
     next(error);
   }
+});
+
+// pre save middleware / hook : we will work on create() and save()
+studentSchema.pre('save', async function (next) {
+  // console.log(this, "Pre hook : we will save the data")
+  // hashing password and save in db
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round),
+  );
+  next();
+});
+
+// post save middleware / hook
+studentSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+// Query Middleware
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre('aggregate', function (next) {
+  // console.log(this.pipeline())
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
 });
 
 // Create a custom static method
