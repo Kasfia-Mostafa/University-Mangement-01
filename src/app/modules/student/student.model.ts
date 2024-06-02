@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 import {
   StudentModel,
   TGuardian,
@@ -9,7 +8,6 @@ import {
   TUsername,
 } from './student.interface';
 import studentValidationSchema from './student.zod.validation';
-import config from '../../config';
 
 // Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
@@ -79,74 +77,86 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 });
 
 // Define the schema for TStudent
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    required: [true, 'USer id is required'],
-    unique: true,
-    ref: 'User',
-  },
-  name: {
-    type: userNameSchema,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ['male', 'female', 'other'],
-    required: true,
-  },
-  dateOfBirth: {
-    type: String,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email',
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'USer id is required'],
+      unique: true,
+      ref: 'User',
+    },
+    name: {
+      type: userNameSchema,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      required: true,
+    },
+    dateOfBirth: {
+      type: String,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (value: string) => validator.isEmail(value),
+        message: '{VALUE} is not a valid email',
+      },
+    },
+    contactNo: {
+      type: String,
+      required: true,
+    },
+    emergencyContactNo: {
+      type: String,
+      required: true,
+    },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    presentAddress: {
+      type: String,
+      required: true,
+    },
+    permanentAddress: {
+      type: String,
+      required: true,
+    },
+    guardian: {
+      type: guardianSchema,
+      required: true,
+    },
+    localGuardian: {
+      type: localGuardianSchema,
+      required: true,
+    },
+    profileImg: {
+      type: String,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
-  contactNo: {
-    type: String,
-    required: true,
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  emergencyContactNo: {
-    type: String,
-    required: true,
-  },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  },
-  presentAddress: {
-    type: String,
-    required: true,
-  },
-  permanentAddress: {
-    type: String,
-    required: true,
-  },
-  guardian: {
-    type: guardianSchema,
-    required: true,
-  },
-  localGuardian: {
-    type: localGuardianSchema,
-    required: true,
-  },
-  profileImg: {
-    type: String,
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+);
+
+// virtual
+studentSchema.virtual('fullName').get(function () {
+  return (`$(this.name.firstName) $(this.name.middleName) $(this.name.lastName)`)
 });
 
 // Add pre-save hook to validate with Zod
@@ -155,29 +165,12 @@ studentSchema.pre('save', function (next) {
   try {
     studentValidationSchema.parse(student);
     next();
-  } catch (error: any) {
+  } catch (error: unknown) {
     next(error);
   }
 });
 
-// pre save middleware / hook : we will work on create() and save()
-studentSchema.pre('save', async function (next) {
-  // console.log(this, "Pre hook : we will save the data")
-  // hashing password and save in db
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
-
-// post save middleware / hook
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
+//
 
 // Query Middleware
 studentSchema.pre('find', function (next) {
