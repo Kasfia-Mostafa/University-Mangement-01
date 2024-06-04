@@ -1,11 +1,12 @@
 import { TStudent } from './student.interface';
 import { Student } from './student.model';
-import studentValidationSchema from './student.zod.validation';
 import { User } from '../user/user.model';
+import { createStudentValidationSchema } from './student.zod.validation';
+
 
 const createStudentIntoDB = async (studentData: TStudent, password: string) => {
   // Validate the student data with Zod schema
-  studentValidationSchema.parse(studentData);
+  createStudentValidationSchema.parse(studentData);
 
   // Check if a student with the same ID already exists
   if (await Student.isUserExists(studentData.id)) {

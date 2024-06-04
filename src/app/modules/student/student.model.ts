@@ -7,7 +7,8 @@ import {
   TStudent,
   TUsername,
 } from './student.interface';
-import studentValidationSchema from './student.zod.validation';
+import { createStudentValidationSchema } from './student.zod.validation';
+
 
 // Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
@@ -163,7 +164,7 @@ studentSchema.virtual('fullName').get(function () {
 studentSchema.pre('save', function (next) {
   const student = this.toObject();
   try {
-    studentValidationSchema.parse(student);
+    createStudentValidationSchema.parse(student);
     next();
   } catch (error: unknown) {
     next(error);
