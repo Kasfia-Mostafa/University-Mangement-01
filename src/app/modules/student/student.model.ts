@@ -143,7 +143,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     profileImg: {
       type: String,
     },
-    isAdmissionSemester:{
+    admissionSemester:{
       type: Schema.Types.ObjectId,
       ref: "AcademicSemester"
     },
@@ -174,8 +174,6 @@ studentSchema.pre('save', function (next) {
     next(error);
   }
 });
-
-//
 
 // Query Middleware
 studentSchema.pre('find', function (next) {
