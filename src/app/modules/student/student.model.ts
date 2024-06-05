@@ -9,7 +9,6 @@ import {
 } from './student.interface';
 import { createStudentValidationSchema } from './student.zod.validation';
 
-
 // Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
   firstName: {
@@ -80,11 +79,11 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 // Define the schema for TStudent
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+    // id: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
@@ -143,13 +142,17 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     profileImg: {
       type: String,
     },
-    admissionSemester:{
+    admissionSemester: {
       type: Schema.Types.ObjectId,
-      ref: "AcademicSemester"
+      ref: 'AcademicSemester',
     },
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
     },
   },
   {
@@ -161,18 +164,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 
 // virtual
 studentSchema.virtual('fullName').get(function () {
-  return (`$(this.name.firstName) $(this.name.middleName) $(this.name.lastName)`)
-});
-
-// Add pre-save hook to validate with Zod
-studentSchema.pre('save', function (next) {
-  const student = this.toObject();
-  try {
-    createStudentValidationSchema.parse(student);
-    next();
-  } catch (error: unknown) {
-    next(error);
-  }
+  return `$(this.name.firstName) $(this.name.middleName) $(this.name.lastName)`;
 });
 
 // Query Middleware
