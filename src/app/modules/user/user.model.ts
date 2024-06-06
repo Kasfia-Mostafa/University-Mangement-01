@@ -28,7 +28,7 @@ const userSchema = new Schema<TUser>(
     },
     isDeleted: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {
