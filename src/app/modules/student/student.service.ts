@@ -3,7 +3,7 @@ import { Student } from './student.model';
 import { User } from '../user/user.model';
 import { createStudentValidationSchema } from './student.zod.validation';
 import mongoose from 'mongoose';
-import AppError from '../../Errors/Errors';
+import AppError from '../../Errors/AppError';
 import httpStatus from 'http-status';
 
 const createStudentIntoDB = async (studentData: TStudent, password: string) => {
