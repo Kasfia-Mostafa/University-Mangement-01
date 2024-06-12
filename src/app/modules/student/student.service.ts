@@ -5,6 +5,8 @@ import { createStudentValidationSchema } from './student.zod.validation';
 import mongoose from 'mongoose';
 import AppError from '../../Errors/AppError';
 import httpStatus from 'http-status';
+import QueryBuilder from '../../builder/queryBuilder';
+import { studentSearchAbleFields } from './student.constant';
 
 const createStudentIntoDB = async (studentData: TStudent, password: string) => {
   // Validate the student data with Zod schema
@@ -34,70 +36,88 @@ const createStudentIntoDB = async (studentData: TStudent, password: string) => {
 };
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  const queryObj = { ...query };
+  // const queryObj = { ...query };
 
   // For search student
-  const studentSearchAbleFields = ['email', 'name.firstName', 'presentAddress'];
-  let searchTerm = '';
-  if (query?.searchTerm) {
-    searchTerm = query?.searchTerm as string;
-  }
+  // const studentSearchAbleFields = ['email', 'name.firstName', 'presentAddress'];
+  // let searchTerm = '';
+  // if (query?.searchTerm) {
+  //   searchTerm = query?.searchTerm as string;
+  // }
 
   // Filtering
-  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-  excludeFields.forEach((element) => delete queryObj[element]);
+  // const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+  // excludeFields.forEach((element) => delete queryObj[element]);
 
-  console.log({ query }, { queryObj });
+  // const searchQuery = Student.find({
+  //   $or: studentSearchAbleFields.map((field) => ({
+  //     [field]: { $regex: searchTerm, $options: 'i' },
+  //   })),
+  // });
 
-  const searchQuery = Student.find({
-    $or: studentSearchAbleFields.map((field) => ({
-      [field]: { $regex: searchTerm, $options: 'i' },
-    })),
-  });
-
-  const filterQuery = searchQuery
-    .find(queryObj)
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    });
+  // const filterQuery = searchQuery
+  //   .find(queryObj)
+  //   .populate('admissionSemester')
+  //   .populate({
+  //     path: 'academicDepartment',
+  //     populate: {
+  //       path: 'academicFaculty',
+  //     },
+  //   });
 
   // sorting
-  let sort = '-createdAt';
-  if (query.sort) {
-    sort = query.sort as string;
-  }
-  const sortQuery = filterQuery.sort(sort);
+  // let sort = '-createdAt';
+  // if (query.sort) {
+  //   sort = query.sort as string;
+  // }
+  // const sortQuery = filterQuery.sort(sort);
 
   // limit and pagination
-  let limit = 1;
-  let page = 1;
-  let skip = 0;
+  // let limit = 1;
+  // let page = 1;
+  // let skip = 0;
 
-  if (query.limit) {
-    limit = Number(query.limit);
-  }
+  // if (query.limit) {
+  //   limit = Number(query.limit);
+  // }
 
-  if (query.page) {
-    page = Number(query.page);
-    skip = (page - 1) * limit;
-  }
-  const paginateQuery = sortQuery.skip(skip);
+  // if (query.page) {
+  //   page = Number(query.page);
+  //   skip = (page - 1) * limit;
+  // }
+  // const paginateQuery = sortQuery.skip(skip);
 
-  const limitQuery = paginateQuery.limit(limit);
+  // const limitQuery = paginateQuery.limit(limit);
 
   // Field limiting
-  let fields = '-__v';
-  if (query.fields) {
-    fields = (query.fields as string).split(',').join(' ');
-    console.log({ fields });
-  }
-  const fieldsQuery = await limitQuery.select(fields);
+  //   let fields = '-__v';
+  //   if (query.fields) {
+  //     fields = (query.fields as string).split(',').join(' ');
+  //     console.log({ fields });
+  //   }
+  //   const fieldsQuery = await limitQuery.select(fields);
 
-  return fieldsQuery;
+  //   return fieldsQuery;
+
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate('admissionSemester')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      }),
+    query,
+  )
+    .search(studentSearchAbleFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await studentQuery.modelQuery;
+  return result;
 };
 
 const getSingleStudentsFromDB = async (id: string) => {
