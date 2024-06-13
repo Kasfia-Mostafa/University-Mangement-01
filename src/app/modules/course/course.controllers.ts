@@ -5,9 +5,7 @@ import sendResponse from '../../utils/sendResponse';
 
 const createCourse = catchAsync(async (req, res) => {
   const result = await CourserServices.createCourseIntoDB(req.body);
-  
-  console.log(result)
-  
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -39,20 +37,17 @@ const getSingleCourse = catchAsync(async (req, res) => {
   });
 });
 
-// const updateCourse = catchAsync(async (req, res) => {
-//   const { id } = req.params;
-//   const result = await CourserServices.updateCourseIntoDB(
-//     id,
-//     req.body,
-//   );
+const updateCourse = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CourserServices.updateCoursesIntoDB(id, req.body);
 
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Course is updated successfully',
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Course is updated successfully',
+    data: result,
+  });
+});
 
 const deleteCourse = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -69,6 +64,6 @@ export const CourseControllers = {
   createCourse,
   getAllCourse,
   getSingleCourse,
-  //   updateCourse,
+  updateCourse,
   deleteCourse,
 };

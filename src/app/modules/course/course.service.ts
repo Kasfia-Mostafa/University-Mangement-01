@@ -9,7 +9,10 @@ const createCourseIntoDB = async (payload: TCourse) => {
 };
 
 const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
-  const courseQuery = new QueryBuilder(Course.find().populate('preRequisiteCourses.course'), query)
+  const courseQuery = new QueryBuilder(
+    Course.find().populate('preRequisiteCourses.course'),
+    query,
+  )
     .search(CourseSearchAbleFields)
     .filter()
     .sort()
@@ -20,7 +23,45 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
 };
 
 const getSingleCoursesFromDB = async (id: string) => {
-  const result = await Course.findById(id).populate('preRequisiteCourses.course');
+  const result = await Course.findById(id).populate(
+    'preRequisiteCourses.course',
+  );
+  return result;
+};
+
+const updateCoursesIntoDB = async (id: string, payload: Partial<TCourse>) => {
+  const { preRequisiteCourses, ...courseRemainingData } = payload;
+
+  const updatedBasicCourseInfo = await Course.findByIdAndUpdate(
+    id,
+    courseRemainingData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+    const deletedPreRequisites = preRequisiteCourses
+      .filter((element) => element.course && element.isDeleted)
+      .map((element) => element.course);
+
+    const deletedPreRequisiteCourses = await Course.findByIdAndUpdate(id, {
+      $pull: { preRequisiteCourses: { course: { $in: deletedPreRequisites } } },
+    });
+
+    // filter out the new course fields
+    const newPreRequisites = preRequisiteCourses?.filter(
+      (element) => element.course && !element.isDeleted,
+    );
+    const newPreRequisitesCourses = await Course.findByIdAndUpdate(id, {
+      $addToSet: { preRequisiteCourses: { $each: newPreRequisites } },
+    });
+  }
+
+  const result = await Course.findById(id).populate(
+    'preRequisiteCourses.course',
+  );
+
   return result;
 };
 
@@ -37,6 +78,6 @@ export const CourserServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
   getSingleCoursesFromDB,
-  // updateCoursesIntoDB,
+  updateCoursesIntoDB,
   deleteCoursesIntoDB,
 };
