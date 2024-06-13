@@ -7,7 +7,7 @@ import {
   TStudent,
   TUsername,
 } from './student.interface';
-import { createStudentValidationSchema } from './student.zod.validation';
+// import { createStudentValidationSchema } from './student.zod.validation';
 
 // Define the schema for TUsername
 const userNameSchema = new Schema<TUsername>({
