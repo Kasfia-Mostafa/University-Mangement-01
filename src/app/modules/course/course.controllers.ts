@@ -5,7 +5,9 @@ import sendResponse from '../../utils/sendResponse';
 
 const createCourse = catchAsync(async (req, res) => {
   const result = await CourserServices.createCourseIntoDB(req.body);
-
+  
+  console.log(result)
+  
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -15,7 +17,7 @@ const createCourse = catchAsync(async (req, res) => {
 });
 
 const getAllCourse = catchAsync(async (req, res) => {
-  const result = await CourserServices.getAllCoursesFromDB();
+  const result = await CourserServices.getAllCoursesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
