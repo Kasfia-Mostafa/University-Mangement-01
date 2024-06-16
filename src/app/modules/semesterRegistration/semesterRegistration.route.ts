@@ -1,5 +1,7 @@
 import express from 'express';
 import validateRequest from '../../middleware/validateRequest';
+import { SemesterRegistrationController } from './semesterRegistration.controller';
+import { SemesterRegistrationValidations } from './semesterRegistration.validation';
 
 const router = express.Router();
 
@@ -31,7 +33,7 @@ router.get(
 
 router.delete(
   '/:id',
-  SemesterRegistrationController.deleteSemesterRegistration,
+//   SemesterRegistrationController.deleteSemesterRegistration,
 );
 
 router.get('/', SemesterRegistrationController.getAllSemesterRegistrations);
