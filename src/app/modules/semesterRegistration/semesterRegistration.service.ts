@@ -4,6 +4,7 @@ import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
 import QueryBuilder from '../../builder/queryBuilder';
+import { registrationStatus } from './semesterRegistration.constant';
 
 const createSemesterRegistrationIntoDB = async (
   payload: TSemesterRegistration,
@@ -11,7 +12,10 @@ const createSemesterRegistrationIntoDB = async (
   // check if there any registered semester that is already upcoming or ongoing
 
   const isThereUpcomingOrOngoingSemester = await SemesterRegistration.findOne({
-    $or: [{ status: 'UPCOMING' }, { status: 'ONGOING' }],
+    $or: [
+      { status: registrationStatus.UPCOMING },
+      { status: registrationStatus.ONGOING },
+    ],
   });
 
   if (isThereUpcomingOrOngoingSemester) {
@@ -84,14 +88,42 @@ const updateSemesterRegistrationIntoDB = async (
   }
 
   // if semester registration ended  , we will not update anything
-  const requestedSemesterStatus = isSemesterRegistrationExists?.status;
+  const currentSemesterStatus = isSemesterRegistrationExists?.status;
 
-  if (requestedSemesterStatus === 'ENDED') {
+  const requestedStatus = payload?.status;
+
+  if (currentSemesterStatus === registrationStatus.ENDED) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `This semester is already ${requestedSemesterStatus}`,
+      `This semester is already ${currentSemesterStatus}`,
     );
   }
+
+  if (
+    currentSemesterStatus === registrationStatus.UPCOMING &&
+    requestedStatus === registrationStatus.ENDED
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `You can not directly change status from ${currentSemesterStatus} to ${requestedStatus}`,
+    );
+  }
+
+  if (
+    currentSemesterStatus === registrationStatus.ONGOING &&
+    requestedStatus === registrationStatus.UPCOMING
+  ) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `You can not directly change status from ${currentSemesterStatus} to ${requestedStatus}`,
+    );
+  }
+
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
 };
 
 export const SemesterRegistrationService = {
