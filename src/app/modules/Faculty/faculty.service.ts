@@ -8,7 +8,34 @@ import { TFaculty } from './faculty.interface';
 import QueryBuilder from '../../builder/queryBuilder';
 import { Faculty } from './faculty.model';
 import AppError from '../../Errors/AppError';
+import { createFacultyValidationSchema } from './faculty.validation';
 
+const createFacultyIntoDB = async (FacultyData: TFaculty, password: string) => {
+  // Validate the student data with Zod schema
+  createFacultyValidationSchema.parse(FacultyData);
+
+  // Check if a student with the same ID already exists
+  if (await Faculty.isUserExists(FacultyData.id)) {
+    throw new Error('Faculty with the same ID already exists');
+  }
+
+  // Create a new User document with the password
+  const newUser = await User.create({
+    id: FacultyData.id,
+    password: password, // Assign the password here
+    role: 'faculty',
+    status: 'in-progress',
+    isDeleted: false,
+  });
+
+  // Assign the created user's _id to the student data
+  FacultyData.user = newUser._id;
+
+  // Create a new Faculty document
+  const result = await Faculty.create(FacultyData);
+
+  return result;
+};
 
 const getAllFacultiesFromDB = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
@@ -92,6 +119,7 @@ const deleteFacultyFromDB = async (id: string) => {
 };
 
 export const FacultyServices = {
+  createFacultyIntoDB,
   getAllFacultiesFromDB,
   getSingleFacultyFromDB,
   updateFacultyIntoDB,

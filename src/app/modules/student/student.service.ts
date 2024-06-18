@@ -5,9 +5,9 @@ import { createStudentValidationSchema } from './student.zod.validation';
 import mongoose from 'mongoose';
 import AppError from '../../Errors/AppError';
 import httpStatus from 'http-status';
-import QueryBuilder from '../../builder/queryBuilder';
 import { studentSearchAbleFields } from './student.constant';
 import { AcademicFaculty } from '../academicFaculty/academicFaculty.model';
+import QueryBuilder from '../../builder/queryBuilder';
 
 const createStudentIntoDB = async (studentData: TStudent, password: string) => {
   // Validate the student data with Zod schema
