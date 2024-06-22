@@ -10,7 +10,7 @@ router.get('/:id', FacultyControllers.getSingleFaculty);
 router.post(
     '/create-faculty',
     validateRequest(createFacultyValidationSchema),
-    UserControllers.cre,
+    UserControllers.createFaculty,
   );
 
 router.patch(

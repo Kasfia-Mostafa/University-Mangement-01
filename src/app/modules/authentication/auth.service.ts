@@ -2,10 +2,10 @@ import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import { createToken } from './auth.utils';
+import AppError from '../../Errors/AppError';
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
@@ -95,7 +95,7 @@ const changePassword = async (
   //hash new password
   const newHashedPassword = await bcrypt.hash(
     payload.newPassword,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_round),
   );
 
   await User.findOneAndUpdate(
